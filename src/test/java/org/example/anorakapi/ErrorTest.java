@@ -27,9 +27,8 @@ public class ErrorTest {
     @Test
     @DisplayName("Tests creation of Error object and its methods with Error list")
     void testErrorCreationAndGetMethods_WithErrorList() {
-        List<Error> errorList = new ArrayList<>();
-        Error error2 = new Error("E002", "I am an extra error?");
-        errorList.add(error2);
+        List<String> errorList = new ArrayList<>();
+        errorList.add("Extra error message");
         Error error = new Error("E001", "Train name cannot be empty", errorList);
 
         assertEquals("E001", error.getErrorCode());

@@ -6,7 +6,7 @@ import java.util.Objects;
 public class Error {
     private String code;
     private String message;
-    private List<Error> errors;
+    private List<String> errors;
 
     Error(String code, String message) throws IllegalArgumentException {
         validateCodeAndMessage(code, message);
@@ -15,7 +15,7 @@ public class Error {
         this.errors = null;
     }
 
-    Error(String code, String message, List<Error> errors) throws IllegalArgumentException {
+    Error(String code, String message, List<String> errors) throws IllegalArgumentException {
         validateCodeAndMessage(code, message);
         this.code = code;
         this.message = message;
@@ -38,7 +38,7 @@ public class Error {
     public String getErrorMessage() {
         return message;
     }
-    public List<Error> getErrors() {
+    public List<String> getErrors() {
         return errors;
     }
 }

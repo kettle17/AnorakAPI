@@ -1,5 +1,6 @@
 package org.example.anorakapi;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -7,6 +8,7 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Sighting {
     @Id
     @GeneratedValue(generator = "uuid2")
@@ -53,5 +55,11 @@ public class Sighting {
     }
     public String getTimestamp() {
         return timestamp;
+    }
+    public void setTrain(Train train) {
+        this.train = train;
+    }
+    public void setStation(Station station) {
+        this.station = station;
     }
 }
