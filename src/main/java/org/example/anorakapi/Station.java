@@ -1,19 +1,24 @@
 package org.example.anorakapi;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import org.hibernate.annotations.GenericGenerator;
+
+import java.util.Objects;
 
 @Entity
 public class Station {
     @Id
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
     private String id;
     private String name;
 
-    Station(String id, String name) throws IllegalArgumentException {
-        if (name == null){
-            throw new IllegalArgumentException("Station name cannot be null");
+    Station(String name) throws IllegalArgumentException {
+        if (Objects.equals(name, "")){
+            throw new IllegalArgumentException("Station name cannot be empty");
         }
-        this.id = id;
         this.name = name;
     }
 

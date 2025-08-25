@@ -5,6 +5,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import org.hibernate.annotations.GenericGenerator;
 
+import java.util.Objects;
+
 @Entity
 public class Train {
     @Id
@@ -19,6 +21,9 @@ public class Train {
     Train(String name, String colour, String trainNumber) throws IllegalArgumentException {
         if (name.length() < 2 || name.length() > 100){
             throw new IllegalArgumentException("Train name must be between 2 and 100 characters");
+        }
+        if (Objects.equals(colour, "") || Objects.equals(trainNumber, "")){
+            throw new IllegalArgumentException("Train colour or number cannot be empty");
         }
 
         this.name = name;
