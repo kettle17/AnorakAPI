@@ -4,6 +4,7 @@ import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("")
@@ -15,8 +16,9 @@ public class AnorakApiController {
     }
 
     @GetMapping("/train")
-    public List<Train> getListTrains(){
-        return anorakApiService.getAllTrains();
+    public Map<String, List<Train>> getListTrains(){
+        List<Train> trains = anorakApiService.getAllTrains();
+        return Map.of("trains", trains);
     }
 
     @GetMapping("/train/{id}")
@@ -25,12 +27,14 @@ public class AnorakApiController {
     }
 
     @GetMapping("/train/{id}/sightings")
-    public List<Sighting> getSightings(@PathVariable String id){
-        return anorakApiService.getSightingsByTrainId(id);
+    public Map<String, List<Sighting>> getSightings(@PathVariable String id){
+        List<Sighting> sightings = anorakApiService.getSightingsByTrainId(id);
+        return Map.of("sightings", sightings);
     }
 
     @PostMapping("/sightings")
-    public List<Sighting> saveSightings(@RequestBody List<Sighting> sightings) {
-        return anorakApiService.saveSightings(sightings);
+    public Map<String, List<Sighting>> saveSightings(@RequestBody List<Sighting> sightings) {
+        List<Sighting> returnedSightings = anorakApiService.saveSightings(sightings);
+        return Map.of("sightings", returnedSightings);
     }
 }

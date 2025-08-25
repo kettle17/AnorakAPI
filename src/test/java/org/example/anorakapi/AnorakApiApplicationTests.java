@@ -35,8 +35,35 @@ class AnorakApiApplicationTests {
     @MockitoBean
     private AnorakApiService anorakApiService;
 
+    @DisplayName("GET /train should return 200 when populated in expected format")
     @Test
-    void contextLoads() {
+    public void testTrainsReturns200() throws Exception {
+        List<Train> trains = new ArrayList<>();
+        Train train1 = new Train("Carl","Blue", "LE-01");
+        Train train2 = new Train("Jim","Red", "MR-23");
+        trains.add(train1);
+        trains.add(train2);
+        when(anorakApiService.getAllTrains()).thenReturn(trains);
+
+        mvc.perform(get("/train")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.trains[*].name").isNotEmpty())
+                .andExpect(jsonPath("$.trains[*].colour").isNotEmpty())
+                .andExpect(jsonPath("$.trains[*].trainNumber").isNotEmpty());
+    }
+
+    @DisplayName("GET /train should return 200 and 'trains' even if empty")
+    @Test
+    public void testTrainsEmptyReturns200() throws Exception {
+        List<Train> trains = new ArrayList<>();
+        when(anorakApiService.getAllTrains()).thenReturn(trains);
+
+        mvc.perform(get("/train")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.trains").isArray())
+                .andExpect(jsonPath("$.trains").isEmpty());
     }
 
 }
