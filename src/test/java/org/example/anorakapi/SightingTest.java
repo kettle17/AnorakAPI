@@ -50,21 +50,51 @@ public class SightingTest {
     @Test
     @DisplayName("Sighting should throw exception if timestamp is empty.")
     void testSightingCreation_ShouldFail_IfTimestampEmptyString() {
-        Exception shortNameException = assertThrows(
+        Exception ex = assertThrows(
                 IllegalArgumentException.class,
                 () -> new Sighting(station, train, "")
         );
-        assertEquals("Timestamp is an incorrect format.", shortNameException.getMessage());
+        assertEquals("Timestamp cannot be an empty string", ex.getMessage());
     }
 
     @Test
     @DisplayName("Sighting should throw exception if timestamp is not correctly formatted.")
     void testSightingCreation_ShouldFail_IfTimestampNotCorrectlyFormatted() {
-        Exception shortNameException = assertThrows(
+        Exception ex = assertThrows(
                 IllegalArgumentException.class,
                 () -> new Sighting(station, train, "2025-08-2517:35:00")
         );
-        assertEquals("Timestamp is an incorrect format.", shortNameException.getMessage());
+        assertEquals("Timestamp is an incorrect format", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Sighting should throw exception if sighting name null.")
+    void testSightingCreation_ShouldFail_IfSightingStationNull() {
+        Exception ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> new Sighting(null, train, "2025-08-25T17:35:42.123Z")
+        );
+        assertEquals("Station, Train or Timestamp cannot be null", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Sighting should throw exception if sighting train null.")
+    void testSightingCreation_ShouldFail_IfSightingTrainNull() {
+        Exception ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> new Sighting(station, null, "2025-08-25T17:35:42.123Z")
+        );
+        assertEquals("Station, Train or Timestamp cannot be null", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Sighting should throw exception if sighting timestamp null.")
+    void testSightingCreation_ShouldFail_IfSightingTimestampNull() {
+        Exception ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> new Sighting(station, train, null)
+        );
+        assertEquals("Station, Train or Timestamp cannot be null", ex.getMessage());
     }
 
 }

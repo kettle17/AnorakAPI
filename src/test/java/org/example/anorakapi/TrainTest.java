@@ -35,42 +35,71 @@ public class TrainTest {
     @Test
     @DisplayName("Train should throw exception if name is too short.")
     void testTrainCreation_ShouldFail_IfNameTooShort() {
-        Exception shortNameException = assertThrows(
+        Exception ex = assertThrows(
                 IllegalArgumentException.class,
                 () -> new Train("A", "Green", "NWR3")
         );
-        assertEquals("Train name must be between 2 and 100 characters", shortNameException.getMessage());
+        assertEquals("Train name must be between 2 and 100 characters", ex.getMessage());
     }
 
     @Test
     @DisplayName("Train should throw exception if name is too long.")
     void testTrainCreation_ShouldFail_IfNameTooLong() {
         String longName = "A".repeat(101);
-        Exception longNameException = assertThrows(
+        Exception ex = assertThrows(
                 IllegalArgumentException.class,
                 () -> new Train(longName, "Green", "NWR3")
         );
-        assertEquals("Train name must be between 2 and 100 characters", longNameException.getMessage());
+        assertEquals("Train name must be between 2 and 100 characters", ex.getMessage());
     }
 
     @Test
     @DisplayName("Train should throw exception if colour empty string.")
     void testTrainCreation_ShouldFail_IfColourEmptyString() {
-        Exception shortNameException = assertThrows(
+        Exception ex = assertThrows(
                 IllegalArgumentException.class,
                 () -> new Train("Hello", "", "NWR3")
         );
-        assertEquals("Train colour or number cannot be empty", shortNameException.getMessage());
+        assertEquals("Train colour or number cannot be empty", ex.getMessage());
     }
 
     @Test
     @DisplayName("Train should throw exception if train number empty string.")
     void testTrainCreation_ShouldFail_IfTrainNumEmptyString() {
-        Exception shortNameException = assertThrows(
+        Exception ex = assertThrows(
                 IllegalArgumentException.class,
                 () -> new Train("Hello", "Blue", "")
         );
-        assertEquals("Train colour or number cannot be empty", shortNameException.getMessage());
+        assertEquals("Train colour or number cannot be empty", ex.getMessage());
     }
 
+    @Test
+    @DisplayName("Train should throw exception if train name null.")
+    void testTrainCreation_ShouldFail_IfTrainNameNull() {
+        Exception ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> new Train(null, "Blue", "E2FF")
+        );
+        assertEquals("Train name, colour, or number cannot be null", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Train should throw exception if train colour null.")
+    void testTrainCreation_ShouldFail_IfTrainColourNull() {
+        Exception ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> new Train("Jerry", null, "E2FF")
+        );
+        assertEquals("Train name, colour, or number cannot be null", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Train should throw exception if train number null.")
+    void testTrainCreation_ShouldFail_IfTrainNumNull() {
+        Exception ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> new Train("Jerry", "Turquoise", null)
+        );
+        assertEquals("Train name, colour, or number cannot be null", ex.getMessage());
+    }
 }

@@ -32,11 +32,21 @@ public class StationTest {
     @Test
     @DisplayName("Station should throw exception if name is empty string.")
     void testStationCreation_ShouldFail_IfNameEmptyString() {
-        Exception shortNameException = assertThrows(
+        Exception ex = assertThrows(
                 IllegalArgumentException.class,
                 () -> new Station("")
         );
-        assertEquals("Station name cannot be empty", shortNameException.getMessage());
+        assertEquals("Station name cannot be empty", ex.getMessage());
+    }
+
+    @Test
+    @DisplayName("Station should throw exception if station name null.")
+    void testStationCreation_ShouldFail_IfStationNameNull() {
+        Exception ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> new Station(null)
+        );
+        assertEquals("Station name cannot be null", ex.getMessage());
     }
 
 }

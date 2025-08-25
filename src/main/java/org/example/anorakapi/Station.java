@@ -16,6 +16,9 @@ public class Station {
     private String name;
 
     Station(String name) throws IllegalArgumentException {
+        if (name == null) {
+            throw new IllegalArgumentException("Station name cannot be null");
+        }
         if (Objects.equals(name, "")){
             throw new IllegalArgumentException("Station name cannot be empty");
         }

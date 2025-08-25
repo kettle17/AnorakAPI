@@ -19,6 +19,9 @@ public class Train {
     private String trainNumber;
 
     Train(String name, String colour, String trainNumber) throws IllegalArgumentException {
+        if (name == null || colour == null || trainNumber == null) {
+            throw new IllegalArgumentException("Train name, colour, or number cannot be null");
+        }
         if (name.length() < 2 || name.length() > 100){
             throw new IllegalArgumentException("Train name must be between 2 and 100 characters");
         }
