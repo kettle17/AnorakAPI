@@ -1,25 +1,26 @@
 package org.example.anorakapi;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 public class Train {
     @Id
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
     private String id;
+
     private String name;
     private String colour;
     private String trainNumber;
 
-    Train(String id, String name, String colour, String trainNumber) throws IllegalArgumentException {
-        if (name == null || colour == null || trainNumber == null){
-            throw new IllegalArgumentException("Train name, colour, or train number cannot be null");
-        }
+    Train(String name, String colour, String trainNumber) throws IllegalArgumentException {
         if (name.length() < 2 || name.length() > 100){
             throw new IllegalArgumentException("Train name must be between 2 and 100 characters");
         }
 
-        this.id = id;
         this.name = name;
         this.colour = colour;
         this.trainNumber = trainNumber;
