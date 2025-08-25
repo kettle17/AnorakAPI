@@ -1,5 +1,6 @@
 name: CI
-on: 
+on:   
+  push:       
   pull_request:
   workflow_dispatch:
 
@@ -27,3 +28,4 @@ jobs:
 
       - name: Build and run tests
         run: ./gradlew clean test
+
