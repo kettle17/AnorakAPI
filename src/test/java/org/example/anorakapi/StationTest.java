@@ -31,7 +31,7 @@ public class StationTest {
 
     @Test
     @DisplayName("Station should throw exception if name is empty string.")
-    void testStationCreation_ShouldFailIfNameShort_Or_Long() {
+    void testStationCreation_ShouldFail_IfNameEmptyString() {
         Exception shortNameException = assertThrows(
                 IllegalArgumentException.class,
                 () -> new Station("")
