@@ -1,14 +1,11 @@
 package org.example.anorakapi;
 
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,8 +17,8 @@ public class ErrorTest {
     void testErrorCreationAndGetMethods_NoErrorList() {
         Error error = new Error("E001", "Train name cannot be empty");
 
-        assertEquals("E001", error.getErrorCode());
-        assertEquals("Train name cannot be empty", error.getErrorMessage());
+        assertEquals("E001", error.getCode());
+        assertEquals("Train name cannot be empty", error.getMessage());
     }
 
     @Test
@@ -31,8 +28,8 @@ public class ErrorTest {
         errorList.add("Extra error message");
         Error error = new Error("E001", "Train name cannot be empty", errorList);
 
-        assertEquals("E001", error.getErrorCode());
-        assertEquals("Train name cannot be empty", error.getErrorMessage());
+        assertEquals("E001", error.getCode());
+        assertEquals("Train name cannot be empty", error.getMessage());
         assertNotNull(error.getErrors());
     }
 

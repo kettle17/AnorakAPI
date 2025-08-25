@@ -1,5 +1,6 @@
 package org.example.anorakapi;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +27,7 @@ public class AnorakApiService {
     public Train getTrainById(String id) {
         Optional<Train> optionalTrain = trainRepository.findById(id);
         if (!optionalTrain.isPresent()) {
-            throw new ErrorException("E404", "Train not found");
+            throw new ErrorException("E404", "Train not found", HttpStatus.NOT_FOUND);
         }
         return optionalTrain.get();
     }
@@ -43,7 +44,7 @@ public class AnorakApiService {
 
         for (Sighting sighting : sightings) {
             if (sighting.getTrain() == null || sighting.getStation() == null || sighting.getTimestamp() == null) {
-                throw new ErrorException("E001", "Train, Station, and Timestamp are required");
+                throw new ErrorException("E001", "Train, Station, and Timestamp are required", HttpStatus.BAD_REQUEST);
             }
 
             Train train = sighting.getTrain();
@@ -78,7 +79,7 @@ public class AnorakApiService {
         }
 
         if (!errors.isEmpty()) {
-            throw new ErrorException("E500", "Some sightings could not be saved", errors);
+            throw new ErrorException("E500", "Some sightings could not be saved", errors, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return savedSightings;

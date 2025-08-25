@@ -1,7 +1,6 @@
 package org.example.anorakapi;
 
 import java.util.List;
-import java.util.Objects;
 
 public class Error {
     private String code;
@@ -32,10 +31,10 @@ public class Error {
         }
     }
 
-    public String getErrorCode() {
+    public String getCode() {
         return code;
     }
-    public String getErrorMessage() {
+    public String getMessage() {
         return message;
     }
     public List<String> getErrors() {
