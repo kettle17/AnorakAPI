@@ -20,16 +20,16 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     implementation 'com.h2database:h2'
     implementation 'org.springframework.boot:spring-boot-starter'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-
-
+    implementation platform("com.google.cloud:spring-cloud-gcp-dependencies:4.8.0")
+    implementation("com.google.cloud:spring-cloud-gcp-data-firestore")
+    implementation("com.google.cloud:spring-cloud-gcp-starter-data-firestore")
+    implementation 'com.google.firebase:firebase-admin:9.2.0'
 }
 
 tasks.named('test') {
@@ -38,6 +38,18 @@ tasks.named('test') {
         events "passed", "skipped", "failed"
         showStandardStreams = true
     }
+
+    afterSuite { desc, result ->
+        if (!desc.parent) { // will only run for the root suite
+            println "\n======================================"
+            println "Test result: ${result.resultType}"
+            println "Test summary: ${result.testCount} tests, " +
+                    "${result.successfulTestCount} passed, " +
+                    "${result.failedTestCount} failed, " +
+                    "${result.skippedTestCount} skipped"
+            println "======================================"
+        }
+    }
 }
 
 jib {
@@ -45,3 +57,4 @@ jib {
         image = "anorakapi:0.0.1-snapshot"
     }
 }
+

@@ -1,6 +1,5 @@
 package org.example.anorakapi;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -9,18 +8,15 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -28,11 +24,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.MOCK
-)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@ActiveProfiles("test")
 @AutoConfigureMockMvc
-@TestPropertySource(locations = "classpath:application-integrationtest.properties")
 class AnorakApiApplicationTests {
 
     @Autowired
@@ -181,27 +175,107 @@ class AnorakApiApplicationTests {
                 .andExpect(jsonPath("$.sightings[0].timestamp").value("2025-08-25T17:35:42Z"));
     }
 
-    @DisplayName("POST /sightings, invalid response that doesnt fit schema will respond with a 400")
+    @DisplayName("POST /sightings, invalid JSON should return 400")
     @Test
     public void testSightings_BadPost_Returns400() throws Exception {
-        //implement
-        fail();
+        String json = """
+    [
+      {
+        "train": { "name": "", "colour": "Red", "trainNumber": "12345" },
+        "station": { "name": "" },
+        "timestamp": ""
+      }
+    ]
+    """;
+
+        mvc.perform(post("/sightings")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("E400"))
+                .andExpect(jsonPath("$.message").exists());
     }
 
-    @DisplayName("POST /sightings, missing properties response that doesnt fit schema will respond with a 400")
+    @DisplayName("POST /sightings, one valid and one failing sighting should return 500")
     @Test
-    public void testSightings_BadPost_Returns400_MissingProperties() throws Exception {
-        //implement
-        fail();
+    public void testSightings_PartialFailure_Returns500() throws Exception {
+        String json = """
+    [
+      {
+        "train": { "name": "Express 1", "colour": "Red", "trainNumber": "12345" },
+        "station": { "name": "London Euston" },
+        "timestamp": "2025-08-25T17:35:42Z"
+      },
+      {
+        "train": { "name": "Express 2", "colour": "Blue", "trainNumber": "67890" },
+        "station": { "name": "King's Cross" },
+        "timestamp": "2025-08-25T18:00:00Z"
+      }
+    ]
+    """;
+
+        Train train1 = new Train("Express 1", "Red", "12345");
+        Station station1 = new Station("London Euston");
+        Sighting sighting1 = new Sighting();
+        sighting1.setTrain(train1);
+        sighting1.setStation(station1);
+        sighting1.setTimestamp("2025-08-25T17:35:42Z");
+
+        when(anorakApiService.saveSightings(org.mockito.ArgumentMatchers.anyList()))
+                .thenThrow(new ErrorException("E500", "Some sightings could not be saved",
+                        List.of("Sighting 2: Failed to save: Simulated failure"), HttpStatus.INTERNAL_SERVER_ERROR));
+
+        mvc.perform(post("/sightings")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.code").value("E500"))
+                .andExpect(jsonPath("$.errors[0]").value("Sighting 2: Failed to save: Simulated failure"));
     }
 
-    @DisplayName("POST /sightings, unsuccessful response (interrupted) responds with a 500")
+    @DisplayName("POST /sightings, multiple sightings return 201 CREATED")
     @Test
-    public void testSightings_UnsuccessfulPost_Returns500() throws Exception {
-        //implement
-        fail();
+    public void testSightings_Multiple_Returns201() throws Exception {
+        String json = """
+            [
+              {
+                "train": { "name": "Express 1", "colour": "Red", "trainNumber": "12345" },
+                "station": { "name": "London Euston" },
+                "timestamp": "2025-08-25T17:35:42Z"
+              },
+              {
+                "train": { "name": "Express 2", "colour": "Blue", "trainNumber": "54321" },
+                "station": { "name": "Manchester Piccadilly" },
+                "timestamp": "2025-08-25T18:00:00Z"
+              }
+            ]
+        """;
+
+        Train t1 = new Train("Express 1", "Red", "12345");
+        Station s1 = new Station("London Euston");
+        Sighting sighting1 = new Sighting();
+        sighting1.setTrain(t1);
+        sighting1.setStation(s1);
+        sighting1.setTimestamp("2025-08-25T17:35:42Z");
+
+        Train t2 = new Train("Express 2", "Blue", "54321");
+        Station s2 = new Station("Manchester Piccadilly");
+        Sighting sighting2 = new Sighting();
+        sighting2.setTrain(t2);
+        sighting2.setStation(s2);
+        sighting2.setTimestamp("2025-08-25T18:00:00Z");
+
+        when(anorakApiService.saveSightings(org.mockito.ArgumentMatchers.anyList()))
+                .thenReturn(List.of(sighting1, sighting2));
+
+        mvc.perform(post("/sightings")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.sightings[0].train.name").value("Express 1"))
+                .andExpect(jsonPath("$.sightings[1].train.name").value("Express 2"))
+                .andExpect(jsonPath("$.sightings[0].station.name").value("London Euston"))
+                .andExpect(jsonPath("$.sightings[1].station.name").value("Manchester Piccadilly"));
     }
-
-
 
 }

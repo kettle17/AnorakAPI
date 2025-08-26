@@ -1,12 +1,15 @@
 name: CI
-on:   
-  push:       
+on:
+  push:
   pull_request:
   workflow_dispatch:
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    env:
+      EMULATOR_PORT: 8085
+      FIRESTORE_EMULATOR_HOST: localhost:8085
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -24,8 +27,21 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
           key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: gradle-${{ runner.os }}-
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+      - name: Install Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: test-project
+
+      - name: Start Firestore emulator
+        run: |
+          docker run -d --rm -p 8085:8080 --name firestore-emulator \
+            gcr.io/google.com/cloudsdktool/cloud-sdk:emulators \
+            gcloud beta emulators firestore start --host-port=0.0.0.0:8080
 
       - name: Build and run tests
-        run: ./gradlew clean test
-
+        run: ./gradlew clean test -Dspring.profiles.active=test --info
+        env:
+          FIRESTORE_EMULATOR_HOST: localhost:8085

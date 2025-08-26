@@ -1,50 +1,45 @@
 package org.example.anorakapi;
 
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import java.time.format.DateTimeParseException;
-import java.util.UUID;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
-@DataJpaTest
+@ExtendWith(MockitoExtension.class)
 public class SightingTest {
 
-    @Autowired
-    private EntityManager entityManager; //stand-in for repository
-
+    @Mock
+    private SightingRepository sightingRepository;
     private Train train;
     private Station station;
 
     @BeforeEach
     void setUp() {
         train = new Train("Henry", "Green", "NWR3");
-        entityManager.persist(train);
-
         station = new Station("Liverpool Street");
-        entityManager.persist(station);
-
-        entityManager.flush();
     }
 
     @Test
     @DisplayName("Tests creation of Sighting object and its methods")
     void testSightingCreationAndGetMethods() {
-        //Using UUID as a standin for auto-generated ID
         Sighting sighting = new Sighting(station, train, "2025-08-25T17:35:42.123Z");
-        entityManager.persist(sighting);
-        entityManager.flush();
+        Sighting sightingWithId = new Sighting(station, train, "2025-08-25T17:35:42.123Z");
+        sightingWithId.setId("mock-id-123");
 
-        assertNotNull(sighting.getId(), "ID should not be null");
-        assertDoesNotThrow(() -> UUID.fromString(sighting.getId()));
+        when(sightingRepository.save(sighting)).thenReturn(Mono.just(sightingWithId));
 
-        assertEquals("Liverpool Street", sighting.getStation().getName());
-        assertEquals("Henry", sighting.getTrain().getName());
-        assertEquals("2025-08-25T17:35:42.123Z", sighting.getTimestamp());
+        Sighting savedSighting = sightingRepository.save(sighting).block();
+
+        assertNotNull(savedSighting.getId(), "ID should not be null");
+        assertEquals("Liverpool Street", savedSighting.getStation().getName());
+        assertEquals("Henry", savedSighting.getTrain().getName());
+        assertEquals("2025-08-25T17:35:42.123Z", savedSighting.getTimestamp());
     }
 
     @Test

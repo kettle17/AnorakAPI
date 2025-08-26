@@ -1,22 +1,16 @@
 package org.example.anorakapi;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.*;
-import org.hibernate.annotations.GenericGenerator;
+import com.google.cloud.firestore.annotation.DocumentId;
+import com.google.cloud.spring.data.firestore.Document;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 
-@Entity
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@Document(collectionName = "sighting")
 public class Sighting {
-    @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @DocumentId
     private String id;
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Station station;
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Train train;
     private String timestamp;
 

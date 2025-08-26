@@ -1,8 +1,10 @@
 package org.example.anorakapi;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import java.util.List;
+import com.google.cloud.spring.data.firestore.FirestoreReactiveRepository;
+import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 
-public interface SightingRepository extends JpaRepository<Sighting, String> {
-    List<Sighting> findAllByTrain(Train train);
+@Repository
+public interface SightingRepository extends FirestoreReactiveRepository<Sighting> {
+    Flux<Sighting> findAllByTrainId(String trainId);
 }

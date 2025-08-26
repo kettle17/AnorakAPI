@@ -2,11 +2,9 @@ package org.example.anorakapi;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.time.OffsetDateTime;
 
 @Service
 public class AnorakApiService {
@@ -21,71 +19,87 @@ public class AnorakApiService {
     }
 
     public List<Train> getAllTrains(){
-        return trainRepository.findAll();
+        return trainRepository.findAll().collectList().block();
     }
 
     public Train getTrainById(String id) {
-        Optional<Train> optionalTrain = trainRepository.findById(id);
-        if (!optionalTrain.isPresent()) {
+        Train train = trainRepository.findById(id).block();
+        if (train == null) {
             throw new ErrorException("E404", "Train not found", HttpStatus.NOT_FOUND);
         }
-        return optionalTrain.get();
+        return train;
     }
 
     public List<Sighting> getSightingsByTrainId(String trainId) {
-        Train train = getTrainById(trainId);
-        return sightingRepository.findAllByTrain(train);
+        List<Sighting> allSightings = sightingRepository.findAll().collectList().block();
+        List<Sighting> filtered = new ArrayList<>();
+        for (Sighting s : allSightings) {
+            if (s.getTrain() != null && trainId.equals(s.getTrain().getId())) {
+                filtered.add(s);
+            }
+        }
+        return filtered;
     }
 
-    @Transactional
     public List<Sighting> saveSightings(List<Sighting> sightings) {
         List<String> errors = new ArrayList<>();
         List<Sighting> savedSightings = new ArrayList<>();
 
-        for (Sighting sighting : sightings) {
-            if (sighting.getTrain() == null || sighting.getStation() == null || sighting.getTimestamp() == null) {
-                throw new ErrorException("E001", "Train, Station, and Timestamp are required", HttpStatus.BAD_REQUEST);
-            }
+        for (int i = 0; i < sightings.size(); i++) {
+            Sighting sighting = sightings.get(i);
+            String prefix = "Sighting " + (i + 1) + ": ";
 
-            Train train = sighting.getTrain();
-            if (train.getId() == null) {
-                Optional<Train> optionalTrain = trainRepository.findByTrainNumber(train.getTrainNumber());
-                if (optionalTrain.isPresent()) {
-                    train = optionalTrain.get();
-                } else {
-                    train = trainRepository.save(train);
-                }
+            if (sighting.getTrain() == null
+                    || sighting.getTrain().getName() == null || sighting.getTrain().getName().isEmpty()
+                    || sighting.getTrain().getColour() == null || sighting.getTrain().getColour().isEmpty()
+                    || sighting.getTrain().getTrainNumber() == null || sighting.getTrain().getTrainNumber().isEmpty()
+                    || sighting.getStation() == null
+                    || sighting.getStation().getName() == null || sighting.getStation().getName().isEmpty()
+                    || sighting.getTimestamp() == null || sighting.getTimestamp().isEmpty()) {
+                throw new ErrorException(
+                        "E001",
+                        "Train, Station, and Timestamp are required and must not be empty",
+                        HttpStatus.BAD_REQUEST
+                );
             }
-
-            Station station = sighting.getStation();
-            if (station.getId() == null) {
-                Optional<Station> optionalStation = stationRepository.findByName(station.getName());
-                if (optionalStation.isPresent()) {
-                    station = optionalStation.get();
-                } else {
-                    station = stationRepository.save(station);
-                }
-            }
-
-            sighting.setTrain(train);
-            sighting.setStation(station);
 
             try {
-                sightingRepository.save(sighting);
+                OffsetDateTime.parse(sighting.getTimestamp());
+
+                Train train = sighting.getTrain();
+                if (train.getId() == null) {
+                    Train existingTrain = trainRepository.findByTrainNumber(train.getTrainNumber()).block();
+                    train = (existingTrain != null) ? existingTrain : trainRepository.save(train).block();
+                }
+
+                Station station = sighting.getStation();
+                if (station.getId() == null) {
+                    Station existingStation = stationRepository.findByName(station.getName()).block();
+                    station = (existingStation != null) ? existingStation : stationRepository.save(station).block();
+                }
+
+                sighting.setTrain(train);
+                sighting.setStation(station);
+
+                sightingRepository.save(sighting).block();
                 savedSightings.add(sighting);
+
             } catch (Exception e) {
-                errors.add("Failed to save sighting: " + sighting + " due to " + e.getMessage());
+                errors.add(prefix + "Failed to save: " + e.getMessage());
             }
         }
 
         if (!errors.isEmpty()) {
-            throw new ErrorException("E500", "Some sightings could not be saved", errors, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ErrorException(
+                    "E500",
+                    "Some sightings could not be saved",
+                    errors,
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
         }
 
         return savedSightings;
     }
-
-
 
 
 

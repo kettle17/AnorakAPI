@@ -1,21 +1,14 @@
 package org.example.anorakapi;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import org.hibernate.annotations.GenericGenerator;
-
 import java.util.Objects;
 
-@Entity
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-public class Train {
-    @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
-    private String id;
+import com.google.cloud.firestore.annotation.DocumentId;
+import com.google.cloud.spring.data.firestore.Document;
 
+@Document(collectionName = "train")
+public class Train {
+    @DocumentId
+    private String trainId;
     private String name;
     private String colour;
     private String trainNumber;
@@ -42,7 +35,7 @@ public class Train {
     }
 
     public String getId() {
-        return id;
+        return trainId;
     }
     public String getName() {
         return name;
@@ -55,6 +48,6 @@ public class Train {
     }
 
     public void setId(String id) {
-        this.id = id;
+        this.trainId = id;
     }
 }
