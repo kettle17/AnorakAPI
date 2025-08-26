@@ -52,21 +52,13 @@ public class AnorakApiService {
             Train train = sighting.getTrain();
             if (train.getId() == null) {
                 Train existingTrain = trainRepository.findByTrainNumber(train.getTrainNumber()).block();
-                if (existingTrain != null) {
-                    train = existingTrain;
-                } else {
-                    train = trainRepository.save(train).block();
-                }
+                train = (existingTrain != null) ? existingTrain : trainRepository.save(train).block();
             }
 
             Station station = sighting.getStation();
             if (station.getId() == null) {
                 Station existingStation = stationRepository.findByName(station.getName()).block();
-                if (existingStation != null) {
-                    station = existingStation;
-                } else {
-                    station = stationRepository.save(station).block();
-                }
+                station = (existingStation != null) ? existingStation : stationRepository.save(station).block();
             }
 
             sighting.setTrain(train);
@@ -86,5 +78,6 @@ public class AnorakApiService {
 
         return savedSightings;
     }
+
 
 }

@@ -7,6 +7,7 @@ import com.google.cloud.spring.data.firestore.Document;
 
 @Document(collectionName = "train")
 public class Train {
+    @DocumentId
     private String trainId;
     private String name;
     private String colour;
