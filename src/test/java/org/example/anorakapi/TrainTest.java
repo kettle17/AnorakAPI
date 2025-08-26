@@ -1,32 +1,25 @@
 package org.example.anorakapi;
 
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-
-import java.util.UUID;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DataJpaTest
+@SpringBootTest
 public class TrainTest {
 
     @Autowired
-    private EntityManager entityManager; //stand-in for repository
+    private TrainRepository trainRepository;
 
     @Test
-    @DisplayName("Tests creation of Train object and its methods")
+    @DisplayName("Tests creation of Train object, repository and its methods")
     void testTrainCreationAndGetMethods() {
-        //Using UUID as a standin for auto-generated ID
         Train train = new Train("Henry", "Green", "NWR3");
+        Train savedTrain = trainRepository.save(train).block();
 
-        entityManager.persist(train);
-        entityManager.flush();
-        assertNotNull(train.getId(), "ID should not be null");
-        assertDoesNotThrow(() -> UUID.fromString(train.getId()));
-
+        assertNotNull(savedTrain.getId(), "ID should not be null");
         assertEquals("Henry", train.getName());
         assertEquals("Green", train.getColour());
         assertEquals("NWR3", train.getTrainNumber());

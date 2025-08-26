@@ -1,9 +1,11 @@
 package org.example.anorakapi;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.google.cloud.spring.data.firestore.FirestoreReactiveRepository;
+import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.Optional;
-
-public interface StationRepository extends JpaRepository<Station, String> {
-    Optional<Station> findByName(String name);
+@Repository
+public interface StationRepository extends FirestoreReactiveRepository<Station> {
+    Mono<Station> findByName(String name);
 }

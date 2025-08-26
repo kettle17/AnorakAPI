@@ -1,8 +1,11 @@
 package org.example.anorakapi;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import java.util.Optional;
+import com.google.cloud.spring.data.firestore.FirestoreReactiveRepository;
+import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-public interface TrainRepository extends JpaRepository<Train, String> {
-    Optional<Train> findByTrainNumber(String trainNumber);
+@Repository
+public interface TrainRepository extends FirestoreReactiveRepository<Train> {
+    Mono<Train> findByTrainNumber(String trainNumber);
 }

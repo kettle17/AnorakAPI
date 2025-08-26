@@ -2,11 +2,9 @@ package org.example.anorakapi;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AnorakApiService {
@@ -21,23 +19,23 @@ public class AnorakApiService {
     }
 
     public List<Train> getAllTrains(){
-        return trainRepository.findAll();
+        return trainRepository.findAll().collectList().block();
     }
 
     public Train getTrainById(String id) {
-        Optional<Train> optionalTrain = trainRepository.findById(id);
-        if (!optionalTrain.isPresent()) {
+        Train train = trainRepository.findById(id).block();
+        if (train == null) {
             throw new ErrorException("E404", "Train not found", HttpStatus.NOT_FOUND);
         }
-        return optionalTrain.get();
+        return train;
     }
 
     public List<Sighting> getSightingsByTrainId(String trainId) {
         Train train = getTrainById(trainId);
-        return sightingRepository.findAllByTrain(train);
+        return sightingRepository.findAllByTrain(train).collectList().block();
     }
 
-    @Transactional
+
     public List<Sighting> saveSightings(List<Sighting> sightings) {
         List<String> errors = new ArrayList<>();
         List<Sighting> savedSightings = new ArrayList<>();
@@ -49,21 +47,21 @@ public class AnorakApiService {
 
             Train train = sighting.getTrain();
             if (train.getId() == null) {
-                Optional<Train> optionalTrain = trainRepository.findByTrainNumber(train.getTrainNumber());
-                if (optionalTrain.isPresent()) {
-                    train = optionalTrain.get();
+                Train existingTrain = trainRepository.findByTrainNumber(train.getTrainNumber()).block();
+                if (existingTrain != null) {
+                    train = existingTrain;
                 } else {
-                    train = trainRepository.save(train);
+                    train = trainRepository.save(train).block();
                 }
             }
 
             Station station = sighting.getStation();
             if (station.getId() == null) {
-                Optional<Station> optionalStation = stationRepository.findByName(station.getName());
-                if (optionalStation.isPresent()) {
-                    station = optionalStation.get();
+                Station existingStation = stationRepository.findByName(station.getName()).block();
+                if (existingStation != null) {
+                    station = existingStation;
                 } else {
-                    station = stationRepository.save(station);
+                    station = stationRepository.save(station).block();
                 }
             }
 
@@ -71,7 +69,7 @@ public class AnorakApiService {
             sighting.setStation(station);
 
             try {
-                sightingRepository.save(sighting);
+                sightingRepository.save(sighting).block();
                 savedSightings.add(sighting);
             } catch (Exception e) {
                 errors.add("Failed to save sighting: " + sighting + " due to " + e.getMessage());
@@ -84,9 +82,5 @@ public class AnorakApiService {
 
         return savedSightings;
     }
-
-
-
-
 
 }

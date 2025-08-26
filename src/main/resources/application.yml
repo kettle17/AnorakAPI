@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: AnorakAPI
+
+  web:
+    resources:
+      add-mappings: false
+
+  cloud:
+    gcp:
+      credentials:
+        location: classpath:key.json
+      firestore:
+        project-id: anorakapi
