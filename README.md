@@ -28,7 +28,7 @@ When posting a valid list of sightings in a format such as:
   ...
 ]
 ```
-All information about the train, station, and the current sighting will be recorded onto the firebase data repository if it does not already exist. It will not accept incorrect formatting.
+All information about the train, station, and the current sighting will be recorded onto the firebase data repository if it does not already exist. Existing stations and trains will be name-matched. It will not accept incorrect formatting.
 
 ## API Spec
 
@@ -200,4 +200,5 @@ components:
         errors:
           type: array
 ```
+
 
