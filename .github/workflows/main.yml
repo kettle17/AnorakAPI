@@ -35,15 +35,11 @@ jobs:
         with:
           project_id: test-project
 
-      - name: Start Firestore Emulator
+      - name: Start Firestore emulator
         run: |
-          gcloud components install cloud-firestore-emulator --quiet
-          gcloud components install beta --quiet
-          gcloud beta emulators firestore start --host-port=localhost:$EMULATOR_PORT --quiet &
-          until nc -z localhost $EMULATOR_PORT; do sleep 1; done
-          sleep 5
-        env:
-          FIRESTORE_EMULATOR_HOST: localhost:8085
+          docker run -d --rm -p 8085:8080 --name firestore-emulator \
+            gcr.io/google.com/cloudsdktool/cloud-sdk:emulators \
+            gcloud beta emulators firestore start --host-port=0.0.0.0:8080
 
       - name: Build and run tests
         run: ./gradlew clean test -Dspring.profiles.active=test --info
