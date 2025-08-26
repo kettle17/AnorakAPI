@@ -6,3 +6,5 @@ spring:
           enabled: true
         host-port: localhost:8085
         project-id: test-project
+      credentials:
+        location: ""
