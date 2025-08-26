@@ -19,10 +19,14 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 @SpringBootTest(
         webEnvironment = SpringBootTest.WebEnvironment.MOCK
@@ -141,6 +145,61 @@ class AnorakApiApplicationTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.sightings").isArray())
                 .andExpect(jsonPath("$.sightings").isEmpty());
+    }
+
+    @DisplayName("POST /sightings, successful response will respond with a 201 CREATED")
+    @Test
+    public void testSightings_SuccessfulPost_Returns201() throws Exception {
+        String json = """
+        [
+          {
+            "train": { "name": "Express 1", "colour": "Red", "trainNumber": "12345" },
+            "station": { "name": "London Euston" },
+            "timestamp": "2025-08-25T17:35:42Z"
+          }
+        ]
+        """;
+
+        Train train = new Train("Express 1", "Red", "12345");
+        Station station = new Station("London Euston");
+        Sighting sighting = new Sighting();
+        sighting.setTrain(train);
+        sighting.setStation(station);
+        sighting.setTimestamp("2025-08-25T17:35:42Z");
+
+        when(anorakApiService.saveSightings(org.mockito.ArgumentMatchers.anyList()))
+                .thenReturn(List.of(sighting));
+
+        mvc.perform(post("/sightings")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.sightings[0].train.name").value("Express 1"))
+                .andExpect(jsonPath("$.sightings[0].train.colour").value("Red"))
+                .andExpect(jsonPath("$.sightings[0].train.trainNumber").value("12345"))
+                .andExpect(jsonPath("$.sightings[0].station.name").value("London Euston"))
+                .andExpect(jsonPath("$.sightings[0].timestamp").value("2025-08-25T17:35:42Z"));
+    }
+
+    @DisplayName("POST /sightings, invalid response that doesnt fit schema will respond with a 400")
+    @Test
+    public void testSightings_BadPost_Returns400() throws Exception {
+        //implement
+        fail();
+    }
+
+    @DisplayName("POST /sightings, missing properties response that doesnt fit schema will respond with a 400")
+    @Test
+    public void testSightings_BadPost_Returns400_MissingProperties() throws Exception {
+        //implement
+        fail();
+    }
+
+    @DisplayName("POST /sightings, unsuccessful response (interrupted) responds with a 500")
+    @Test
+    public void testSightings_UnsuccessfulPost_Returns500() throws Exception {
+        //implement
+        fail();
     }
 
 

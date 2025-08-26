@@ -1,6 +1,7 @@
 package org.example.anorakapi;
 
 import org.apache.coyote.Response;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -33,6 +34,7 @@ public class AnorakApiController {
     }
 
     @PostMapping("/sightings")
+    @ResponseStatus(HttpStatus.CREATED)
     public Map<String, List<Sighting>> saveSightings(@RequestBody List<Sighting> sightings) {
         List<Sighting> returnedSightings = anorakApiService.saveSightings(sightings);
         return Map.of("sightings", returnedSightings);

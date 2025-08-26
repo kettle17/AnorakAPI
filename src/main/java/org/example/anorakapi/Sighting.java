@@ -62,4 +62,13 @@ public class Sighting {
     public void setStation(Station station) {
         this.station = station;
     }
+
+    public void setTimestamp(String timestamp) throws IllegalArgumentException {
+        try {
+            OffsetDateTime.parse(timestamp);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Timestamp is an incorrect format", e);
+        }
+        this.timestamp = timestamp;
+    }
 }
