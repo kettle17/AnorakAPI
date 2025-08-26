@@ -7,6 +7,9 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    env:
+      EMULATOR_PORT: 8085
+      FIRESTORE_EMULATOR_HOST: localhost:8085
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -33,15 +36,19 @@ jobs:
 
       - name: Start Firestore Emulator
         run: |
+          echo "Starting Firestore emulator on port $EMULATOR_PORT..."
           gcloud components install cloud-firestore-emulator
-          gcloud beta emulators firestore start --host-port=localhost:8080 --quiet &
-          echo "Waiting for Firestore emulator to start..."
-          until nc -z localhost 8080; do sleep 1; done
-          echo "Firestore emulator is ready"
+          gcloud beta emulators firestore start --host-port=localhost:$EMULATOR_PORT --quiet &
+          # Wait for emulator port to be open
+          echo "Waiting for Firestore emulator to accept connections..."
+          until nc -z localhost $EMULATOR_PORT; do sleep 1; done
+          # Wait a few more seconds to ensure emulator is fully ready
+          sleep 5
+          echo "Firestore emulator is ready."
         env:
-          FIRESTORE_EMULATOR_HOST: localhost:8080
+          FIRESTORE_EMULATOR_HOST: localhost:8085
 
       - name: Build and run tests with test profile
-        run: ./gradlew clean test -Dspring.profiles.active=test
+        run: ./gradlew clean test -Dspring.profiles.active=test --info
         env:
-          FIRESTORE_EMULATOR_HOST: localhost:8080
+          FIRESTORE_EMULATOR_HOST: localhost:8085

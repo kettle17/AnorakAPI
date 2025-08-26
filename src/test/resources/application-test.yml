@@ -1,8 +1,8 @@
 spring:
-  profiles: test
-
   cloud:
     gcp:
       firestore:
-        emulator-enabled: true
+        emulator:
+          enabled: true
+        host-port: localhost:8080
         project-id: test-project
