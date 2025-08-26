@@ -4,7 +4,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class AnorakApiService {
@@ -32,12 +31,14 @@ public class AnorakApiService {
 
     public List<Sighting> getSightingsByTrainId(String trainId) {
         List<Sighting> allSightings = sightingRepository.findAll().collectList().block();
-        return allSightings.stream()
-                .filter(s -> s.getTrain() != null && trainId.equals(s.getTrain().getId()))
-                .collect(Collectors.toList());
+        List<Sighting> filtered = new ArrayList<>();
+        for (Sighting s : allSightings) {
+            if (s.getTrain() != null && trainId.equals(s.getTrain().getId())) {
+                filtered.add(s);
+            }
+        }
+        return filtered;
     }
-
-
 
     public List<Sighting> saveSightings(List<Sighting> sightings) {
         List<String> errors = new ArrayList<>();
