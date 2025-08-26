@@ -2,9 +2,9 @@ package org.example.anorakapi;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AnorakApiService {
@@ -31,9 +31,12 @@ public class AnorakApiService {
     }
 
     public List<Sighting> getSightingsByTrainId(String trainId) {
-        Train train = getTrainById(trainId);
-        return sightingRepository.findAllByTrain(train).collectList().block();
+        List<Sighting> allSightings = sightingRepository.findAll().collectList().block();
+        return allSightings.stream()
+                .filter(s -> s.getTrain() != null && trainId.equals(s.getTrain().getId()))
+                .collect(Collectors.toList());
     }
+
 
 
     public List<Sighting> saveSightings(List<Sighting> sightings) {

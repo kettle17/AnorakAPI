@@ -7,8 +7,7 @@ import com.google.cloud.spring.data.firestore.Document;
 
 @Document(collectionName = "station")
 public class Station {
-    @DocumentId
-    private String id;
+    private String stationId;
     private String name;
 
     Station(String name) throws IllegalArgumentException {
@@ -27,13 +26,13 @@ public class Station {
     }
 
     public String getId() {
-        return id;
+        return stationId;
     }
     public String getName() {
         return name;
     }
 
     public void setId(String id) {
-        this.id = id;
+        this.stationId = id;
     }
 }
