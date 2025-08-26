@@ -27,7 +27,8 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
           key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: gradle-${{ runner.os }}-
+          restore-keys: |
+            gradle-${{ runner.os }}-
 
       - name: Install Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
@@ -36,19 +37,15 @@ jobs:
 
       - name: Start Firestore Emulator
         run: |
-          echo "Starting Firestore emulator on port $EMULATOR_PORT..."
-          gcloud components install cloud-firestore-emulator
+          gcloud components install cloud-firestore-emulator --quiet
+          gcloud components install beta --quiet
           gcloud beta emulators firestore start --host-port=localhost:$EMULATOR_PORT --quiet &
-          # Wait for emulator port to be open
-          echo "Waiting for Firestore emulator to accept connections..."
           until nc -z localhost $EMULATOR_PORT; do sleep 1; done
-          # Wait a few more seconds to ensure emulator is fully ready
           sleep 5
-          echo "Firestore emulator is ready."
         env:
           FIRESTORE_EMULATOR_HOST: localhost:8085
 
-      - name: Build and run tests with test profile
+      - name: Build and run tests
         run: ./gradlew clean test -Dspring.profiles.active=test --info
         env:
           FIRESTORE_EMULATOR_HOST: localhost:8085
