@@ -38,6 +38,18 @@ tasks.named('test') {
         events "passed", "skipped", "failed"
         showStandardStreams = true
     }
+
+    afterSuite { desc, result ->
+        if (!desc.parent) { // will only run for the root suite
+            println "\n======================================"
+            println "Test result: ${result.resultType}"
+            println "Test summary: ${result.testCount} tests, " +
+                    "${result.successfulTestCount} passed, " +
+                    "${result.failedTestCount} failed, " +
+                    "${result.skippedTestCount} skipped"
+            println "======================================"
+        }
+    }
 }
 
 jib {
