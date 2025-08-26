@@ -24,11 +24,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.MOCK
-)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
+@TestPropertySource(locations = "classpath:application-integrationtest.properties")
 class AnorakApiApplicationTests {
 
     @Autowired
