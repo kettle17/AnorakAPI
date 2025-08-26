@@ -35,7 +35,13 @@ jobs:
         run: |
           gcloud components install cloud-firestore-emulator
           gcloud beta emulators firestore start --host-port=localhost:8080 --quiet &
-          sleep 5
+          echo "Waiting for Firestore emulator to start..."
+          until nc -z localhost 8080; do sleep 1; done
+          echo "Firestore emulator is ready"
+        env:
+          FIRESTORE_EMULATOR_HOST: localhost:8080
 
       - name: Build and run tests with test profile
         run: ./gradlew clean test -Dspring.profiles.active=test
+        env:
+          FIRESTORE_EMULATOR_HOST: localhost:8080
