@@ -1,6 +1,6 @@
 name: CI
-on:   
-  push:       
+on:
+  push:
   pull_request:
   workflow_dispatch:
 
@@ -26,6 +26,16 @@ jobs:
           key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: gradle-${{ runner.os }}-
 
-      - name: Build and run tests
-        run: ./gradlew clean test
+      - name: Install Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: test-project
 
+      - name: Start Firestore Emulator
+        run: |
+          gcloud components install cloud-firestore-emulator
+          gcloud beta emulators firestore start --host-port=localhost:8080 --quiet &
+          sleep 5
+
+      - name: Build and run tests with test profile
+        run: ./gradlew clean test -Dspring.profiles.active=test

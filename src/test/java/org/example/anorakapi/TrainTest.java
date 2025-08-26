@@ -2,18 +2,19 @@ package org.example.anorakapi;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import reactor.core.publisher.Mono;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 public class TrainTest {
 
-    @MockitoBean
-    private TrainRepository trainRepository;
+    @Mock
+    private TrainRepository trainRepository;  // 👈 Mockito will now inject this
 
     @Test
     @DisplayName("Tests creation of Train object, repository and its methods")
@@ -25,9 +26,9 @@ public class TrainTest {
         Train savedTrain = trainRepository.save(train).block();
 
         assertNotNull(savedTrain.getId(), "ID should not be null");
-        assertEquals("Henry", train.getName());
-        assertEquals("Green", train.getColour());
-        assertEquals("NWR3", train.getTrainNumber());
+        assertEquals("Henry", savedTrain.getName());
+        assertEquals("Green", savedTrain.getColour());
+        assertEquals("NWR3", savedTrain.getTrainNumber());
     }
 
     @Test
