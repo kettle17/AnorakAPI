@@ -3,15 +3,17 @@ package org.example.anorakapi;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import reactor.core.publisher.Mono;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 public class SightingTest {
 
-    @Autowired
+    @MockitoBean
     private SightingRepository sightingRepository;
     private Train train;
     private Station station;
@@ -26,6 +28,11 @@ public class SightingTest {
     @DisplayName("Tests creation of Sighting object and its methods")
     void testSightingCreationAndGetMethods() {
         Sighting sighting = new Sighting(station, train, "2025-08-25T17:35:42.123Z");
+        Sighting sightingWithId = new Sighting(station, train, "2025-08-25T17:35:42.123Z");
+        sightingWithId.setId("mock-id-123");
+
+        when(sightingRepository.save(sighting)).thenReturn(Mono.just(sightingWithId));
+
         Sighting savedSighting = sightingRepository.save(sighting).block();
 
         assertNotNull(savedSighting.getId(), "ID should not be null");

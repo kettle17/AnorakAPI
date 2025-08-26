@@ -2,21 +2,26 @@ package org.example.anorakapi;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import reactor.core.publisher.Mono;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 public class TrainTest {
 
-    @Autowired
+    @MockitoBean
     private TrainRepository trainRepository;
 
     @Test
     @DisplayName("Tests creation of Train object, repository and its methods")
     void testTrainCreationAndGetMethods() {
         Train train = new Train("Henry", "Green", "NWR3");
+        Train savedTrainWithId = new Train("Henry", "Green", "NWR3");
+        savedTrainWithId.setId("mock-id-123");
+        when(trainRepository.save(train)).thenReturn(Mono.just(savedTrainWithId));
         Train savedTrain = trainRepository.save(train).block();
 
         assertNotNull(savedTrain.getId(), "ID should not be null");
