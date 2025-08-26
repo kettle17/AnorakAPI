@@ -4,5 +4,5 @@ spring:
       firestore:
         emulator:
           enabled: true
-        host-port: localhost:8080
+        host-port: localhost:8085
         project-id: test-project
