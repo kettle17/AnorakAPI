@@ -34,6 +34,12 @@ public class AnorakApiController {
         return Map.of("sightings", sightings);
     }
 
+    @GetMapping("/station")
+    public Map<String, List<Station>> getListStations(){
+        List<Station> stations = anorakApiService.getAllStations();
+        return Map.of("stations", stations);
+    }
+
     @PostMapping("/sightings")
     @ResponseStatus(HttpStatus.CREATED)
     public Map<String, List<Sighting>> saveSightings(@Valid @RequestBody List<Sighting> sightings) {

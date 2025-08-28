@@ -68,6 +68,24 @@ class AnorakApiApplicationTests {
                 .andExpect(jsonPath("$.trains").isEmpty());
     }
 
+    //Station test
+
+    @DisplayName("GET /station should return 200 when populated in expected format")
+    @Test
+    public void testStationReturns200() throws Exception {
+        List<Station> stations = new ArrayList<>();
+        Station station1 = new Station("Station A");
+        Station station2 = new Station("Station B");
+        stations.add(station1);
+        stations.add(station2);
+        when(anorakApiService.getAllStations()).thenReturn(stations);
+
+        mvc.perform(get("/station")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.stations[*].name").isNotEmpty());
+    }
+
     //Train/{id} tests
 
     @DisplayName("GET /train/{id}, populating and calling should return 200")

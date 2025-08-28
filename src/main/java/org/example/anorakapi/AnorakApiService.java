@@ -22,6 +22,10 @@ public class AnorakApiService {
         return trainRepository.findAll().collectList().block();
     }
 
+    public List<Station> getAllStations() {
+        return stationRepository.findAll().collectList().block();
+    }
+
     public Train getTrainById(String id) {
         Train train = trainRepository.findById(id).block();
         if (train == null) {
