@@ -4,13 +4,22 @@ import java.util.Objects;
 
 import com.google.cloud.firestore.annotation.DocumentId;
 import com.google.cloud.spring.data.firestore.Document;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Document(collectionName = "train")
 public class Train {
     @DocumentId
     private String trainId;
+
+    @NotBlank(message = "Train name cannot be empty")
+    @Size(min = 2, max = 100, message = "Train name must be between 2 and 100 characters")
     private String name;
+
+    @NotBlank(message = "Train colour cannot be empty")
     private String colour;
+
+    @NotBlank(message = "Train number cannot be empty")
     private String trainNumber;
 
     Train(String name, String colour, String trainNumber) throws IllegalArgumentException {

@@ -6,5 +6,4 @@ import reactor.core.publisher.Flux;
 
 @Repository
 public interface SightingRepository extends FirestoreReactiveRepository<Sighting> {
-    Flux<Sighting> findAllByTrainId(String trainId);
 }

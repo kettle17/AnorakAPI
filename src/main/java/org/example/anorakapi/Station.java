@@ -4,11 +4,14 @@ import java.util.Objects;
 
 import com.google.cloud.firestore.annotation.DocumentId;
 import com.google.cloud.spring.data.firestore.Document;
+import jakarta.validation.constraints.NotBlank;
 
 @Document(collectionName = "station")
 public class Station {
     @DocumentId
     private String stationId;
+
+    @NotBlank(message = "Station name cannot be empty")
     private String name;
 
     Station(String name) throws IllegalArgumentException {

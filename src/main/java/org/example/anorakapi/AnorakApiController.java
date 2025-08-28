@@ -1,5 +1,6 @@
 package org.example.anorakapi;
 
+import jakarta.validation.Valid;
 import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +36,7 @@ public class AnorakApiController {
 
     @PostMapping("/sightings")
     @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, List<Sighting>> saveSightings(@RequestBody List<Sighting> sightings) {
+    public Map<String, List<Sighting>> saveSightings(@Valid @RequestBody List<Sighting> sightings) {
         List<Sighting> returnedSightings = anorakApiService.saveSightings(sightings);
         return Map.of("sightings", returnedSightings);
     }

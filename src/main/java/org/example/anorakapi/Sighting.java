@@ -2,6 +2,8 @@ package org.example.anorakapi;
 
 import com.google.cloud.firestore.annotation.DocumentId;
 import com.google.cloud.spring.data.firestore.Document;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
@@ -10,8 +12,13 @@ import java.time.format.DateTimeParseException;
 public class Sighting {
     @DocumentId
     private String id;
+    @Valid
     private Station station;
+
+    @Valid
     private Train train;
+
+    @NotBlank(message = "Timestamp cannot be empty")
     private String timestamp;
 
     Sighting(Station station, Train train, String timestamp) throws IllegalArgumentException {
