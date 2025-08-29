@@ -129,8 +129,8 @@ class AnorakApiApplicationTests {
         train.setId("train-123");
         Station station = new Station("Liverpool Street");
         station.setId("station-456");
-        Sighting sighting = new Sighting(station, train, "2025-08-25T10:15:30Z");
-        List<Sighting> sightings = List.of(sighting);
+        SightingDTO sighting = new SightingDTO(station, train, "2025-08-25T10:15:30Z");
+        List<SightingDTO> sightings = List.of(sighting);
 
         when(anorakApiService.getSightingsByTrainId("train-123")).thenReturn(sightings);
 
@@ -174,7 +174,7 @@ class AnorakApiApplicationTests {
 
         Train train = new Train("Express 1", "Red", "12345");
         Station station = new Station("London Euston");
-        Sighting sighting = new Sighting();
+        SightingDTO sighting = new SightingDTO();
         sighting.setTrain(train);
         sighting.setStation(station);
         sighting.setTimestamp("2025-08-25T17:35:42Z");
@@ -234,7 +234,7 @@ class AnorakApiApplicationTests {
 
         Train train1 = new Train("Express 1", "Red", "12345");
         Station station1 = new Station("London Euston");
-        Sighting sighting1 = new Sighting();
+        SightingDTO sighting1 = new SightingDTO();
         sighting1.setTrain(train1);
         sighting1.setStation(station1);
         sighting1.setTimestamp("2025-08-25T17:35:42Z");
@@ -271,14 +271,14 @@ class AnorakApiApplicationTests {
 
         Train t1 = new Train("Express 1", "Red", "12345");
         Station s1 = new Station("London Euston");
-        Sighting sighting1 = new Sighting();
+        SightingDTO sighting1 = new SightingDTO();
         sighting1.setTrain(t1);
         sighting1.setStation(s1);
         sighting1.setTimestamp("2025-08-25T17:35:42Z");
 
         Train t2 = new Train("Express 2", "Blue", "54321");
         Station s2 = new Station("Manchester Piccadilly");
-        Sighting sighting2 = new Sighting();
+        SightingDTO sighting2 = new SightingDTO();
         sighting2.setTrain(t2);
         sighting2.setStation(s2);
         sighting2.setTimestamp("2025-08-25T18:00:00Z");
