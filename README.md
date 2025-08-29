@@ -11,6 +11,9 @@ Returns the specific data of the chosen train id.
 ## GET /train/{id}/sightings
 Returns a list of all sightings of that specific train, with station and timestamp metadata.
 
+## GET /station
+Returns all current stations in the data repository with their ids and names.
+
 ## POST /sightings
 When posting a valid list of sightings in a format such as:
 ```
@@ -200,5 +203,6 @@ components:
         errors:
           type: array
 ```
+
 
 
