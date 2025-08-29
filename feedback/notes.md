@@ -27,4 +27,5 @@ if (sighting.getTrain() == null
 ```
 Consider abstracting this logic or changing when a sighting object gets instantiated.
 
-5. 
+5. Are you implementing this method `findByTrainNumber`: 
+![alt text](image.png)
