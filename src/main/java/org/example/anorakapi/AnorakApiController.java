@@ -29,8 +29,8 @@ public class AnorakApiController {
     }
 
     @GetMapping("/train/{id}/sightings")
-    public Map<String, List<Sighting>> getSightings(@PathVariable String id){
-        List<Sighting> sightings = anorakApiService.getSightingsByTrainId(id);
+    public Map<String, List<SightingDTO>> getSightings(@PathVariable String id){
+        List<SightingDTO> sightings = anorakApiService.getSightingsByTrainId(id);
         return Map.of("sightings", sightings);
     }
 
@@ -42,8 +42,8 @@ public class AnorakApiController {
 
     @PostMapping("/sightings")
     @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, List<Sighting>> saveSightings(@Valid @RequestBody List<Sighting> sightings) {
-        List<Sighting> returnedSightings = anorakApiService.saveSightings(sightings);
+    public Map<String, List<SightingDTO>> saveSightings(@Valid @RequestBody List<SightingDTO> sightings) {
+        List<SightingDTO> returnedSightings = anorakApiService.saveSightings(sightings);
         return Map.of("sightings", returnedSightings);
     }
 }

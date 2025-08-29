@@ -1,29 +1,17 @@
 package org.example.anorakapi;
 
 import com.google.cloud.firestore.DocumentReference;
-import com.google.cloud.firestore.annotation.DocumentId;
-import com.google.cloud.spring.data.firestore.Document;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 
-@Document(collectionName = "sightingz")
-public class Sighting {
-    @DocumentId
+public class SightingDTO {
     private String id;
-
-    @NotNull(message = "Station reference is required")
-    private DocumentReference station;
-
-    @NotNull(message = "Train reference is required")
-    private DocumentReference train;
-
-    @NotBlank(message = "Timestamp cannot be empty")
+    private Station station;
+    private Train train;
     private String timestamp;
 
-    Sighting(DocumentReference station, DocumentReference train, String timestamp) throws IllegalArgumentException {
+    SightingDTO(Station station, Train train, String timestamp) throws IllegalArgumentException {
         if (station == null || train == null || timestamp == null) {
             throw new IllegalArgumentException("Station, Train or Timestamp cannot be null");
         }
@@ -40,7 +28,7 @@ public class Sighting {
         this.timestamp = timestamp; // still stored as string
     }
 
-    public Sighting() {
+    public SightingDTO() {
 
     }
 
@@ -50,19 +38,19 @@ public class Sighting {
     public void setId(String id) {
         this.id = id;
     }
-    public DocumentReference getStation(){
+    public Station getStation(){
         return station;
     }
-    public DocumentReference getTrain(){
+    public Train getTrain(){
         return train;
     }
     public String getTimestamp() {
         return timestamp;
     }
-    public void setTrain(DocumentReference train) {
+    public void setTrain(Train train) {
         this.train = train;
     }
-    public void setStation(DocumentReference station) {
+    public void setStation(Station station) {
         this.station = station;
     }
 

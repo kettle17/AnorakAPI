@@ -1,5 +1,7 @@
 package org.example.anorakapi;
 
+import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.Firestore;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -11,11 +13,13 @@ public class AnorakApiService {
     private final TrainRepository trainRepository;
     private final StationRepository stationRepository;
     private final SightingRepository sightingRepository;
+    private final Firestore firestore;
 
-    public AnorakApiService(TrainRepository trainRepository, StationRepository stationRepository, SightingRepository sightingRepository) {
+    public AnorakApiService(TrainRepository trainRepository, StationRepository stationRepository, SightingRepository sightingRepository, Firestore firestore) {
         this.trainRepository = trainRepository;
         this.stationRepository = stationRepository;
         this.sightingRepository = sightingRepository;
+        this.firestore = firestore;
     }
 
     public List<Train> getAllTrains(){
@@ -34,32 +38,50 @@ public class AnorakApiService {
         return train;
     }
 
-    public List<Sighting> getSightingsByTrainId(String trainId) {
-        List<Sighting> allSightings = sightingRepository.findAll().collectList().block();
-        List<Sighting> filtered = new ArrayList<>();
-        for (Sighting s : allSightings) {
-            if (s.getTrain() != null && trainId.equals(s.getTrain().getId())) {
-                filtered.add(s);
-            }
-        }
-        return filtered;
+    private String resolveTrainId(DocumentReference trainRef) {
+        return trainRef.getId();
     }
 
-    public List<Sighting> saveSightings(List<Sighting> sightings) {
+    private String resolveStationId(DocumentReference stationRef) {
+        return stationRef.getId();
+    }
+
+    private SightingDTO convertToDTO(Sighting sighting) {
+        Train train = trainRepository.findById(resolveTrainId(sighting.getTrain())).block();
+        Station station = stationRepository.findById(resolveStationId(sighting.getStation())).block();
+        SightingDTO dto = new SightingDTO(station, train, sighting.getTimestamp());
+        dto.setId(sighting.getId());
+        return dto;
+    }
+
+    public List<SightingDTO> getSightingsByTrainId(String trainId) {
+        List<Sighting> allSightings = sightingRepository.findAll().collectList().block();
+        List<SightingDTO> dtos = new ArrayList<>();
+
+        for (Sighting s : allSightings) {
+            if (s.getTrain() != null && trainId.equals(resolveTrainId(s.getTrain()))) {
+                dtos.add(convertToDTO(s));
+            }
+        }
+
+        return dtos;
+    }
+
+    public List<SightingDTO> saveSightings(List<SightingDTO> sightings) {
         List<String> errors = new ArrayList<>();
-        List<Sighting> savedSightings = new ArrayList<>();
+        List<SightingDTO> savedSightings = new ArrayList<>();
 
         for (int i = 0; i < sightings.size(); i++) {
-            Sighting sighting = sightings.get(i);
+            SightingDTO dto = sightings.get(i);
             String prefix = "Sighting " + (i + 1) + ": ";
 
-            if (sighting.getTrain() == null
-                    || sighting.getTrain().getName() == null || sighting.getTrain().getName().isEmpty()
-                    || sighting.getTrain().getColour() == null || sighting.getTrain().getColour().isEmpty()
-                    || sighting.getTrain().getTrainNumber() == null || sighting.getTrain().getTrainNumber().isEmpty()
-                    || sighting.getStation() == null
-                    || sighting.getStation().getName() == null || sighting.getStation().getName().isEmpty()
-                    || sighting.getTimestamp() == null || sighting.getTimestamp().isEmpty()) {
+            if (dto.getTrain() == null
+                    || dto.getTrain().getName() == null || dto.getTrain().getName().isEmpty()
+                    || dto.getTrain().getColour() == null || dto.getTrain().getColour().isEmpty()
+                    || dto.getTrain().getTrainNumber() == null || dto.getTrain().getTrainNumber().isEmpty()
+                    || dto.getStation() == null
+                    || dto.getStation().getName() == null || dto.getStation().getName().isEmpty()
+                    || dto.getTimestamp() == null || dto.getTimestamp().isEmpty()) {
                 throw new ErrorException(
                         "E001",
                         "Train, Station, and Timestamp are required and must not be empty",
@@ -68,25 +90,30 @@ public class AnorakApiService {
             }
 
             try {
-                OffsetDateTime.parse(sighting.getTimestamp());
+                OffsetDateTime.parse(dto.getTimestamp());
 
-                Train train = sighting.getTrain();
+                Train train = dto.getTrain();
                 if (train.getId() == null) {
                     Train existingTrain = trainRepository.findByTrainNumber(train.getTrainNumber()).block();
                     train = (existingTrain != null) ? existingTrain : trainRepository.save(train).block();
                 }
 
-                Station station = sighting.getStation();
+                Station station = dto.getStation();
                 if (station.getId() == null) {
                     Station existingStation = stationRepository.findByName(station.getName()).block();
                     station = (existingStation != null) ? existingStation : stationRepository.save(station).block();
                 }
 
-                sighting.setTrain(train);
-                sighting.setStation(station);
+                DocumentReference trainRef = firestore.collection("train").document(train.getId());
+                DocumentReference stationRef = firestore.collection("station").document(station.getId());
 
+                Sighting sighting = new Sighting(stationRef, trainRef, dto.getTimestamp());
                 sightingRepository.save(sighting).block();
-                savedSightings.add(sighting);
+
+                dto.setTrain(train);
+                dto.setStation(station);
+                dto.setId(sighting.getId());
+                savedSightings.add(dto);
 
             } catch (Exception e) {
                 errors.add(prefix + "Failed to save: " + e.getMessage());
@@ -104,7 +131,5 @@ public class AnorakApiService {
 
         return savedSightings;
     }
-
-
 
 }
