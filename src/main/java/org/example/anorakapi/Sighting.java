@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
 
-@Document(collectionName = "sightingz")
+@Document(collectionName = "sighting")
 public class Sighting {
     @DocumentId
     private String id;
